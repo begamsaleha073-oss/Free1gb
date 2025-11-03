@@ -1,28 +1,11 @@
 {
   "version": 2,
-  "name": "happy-bot",
   "builds": [
-    {
-      "src": "public/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
+    { "src": "public/**", "use": "@vercel/static" },
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/",
-      "dest": "/public/index.html"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    }
-  ],
-  "env": {
-    "BOT_TOKEN": "@bot-token",
-    "WEBSITE_URL": "@website-url"
-  }
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/api/(.*)", "dest": "/api/$1" }
+  ]
 }
